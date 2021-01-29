@@ -1,1 +1,2 @@
 THIS IS A FILE WITH DATA IN IT
+new text
