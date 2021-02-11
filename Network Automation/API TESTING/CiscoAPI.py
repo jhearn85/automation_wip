@@ -12,7 +12,7 @@ import os.path
 
 #ATTEMPT AT INTEGRATING TEMPLATE BUILDER WITH RESTAPI
 JSON_TEMPLATES = Environment(loader=FileSystemLoader('.'), trim_blocks=True)
-url = "https://192.168.0.100/"
+url = "https://192.168.0.111/"
 
 def get_token(username, password):
     partial_url = "api/aaaLogin.json"
@@ -77,11 +77,22 @@ if __name__ == "__main__":
 
 
 #THIS IS VIA THE RESTCONF - STANDARD COMPATIBLE via RESTCONF CLI CMD
+from getpass import getpass
+
+import requests
+import json
+from pprint import pprint
+import sys
+import yaml
+from jinja2 import Environment, FileSystemLoader
+from netmiko import ConnectHandler
+from datetime import datetime
+import os.path
 
 device = {
-   "ip": "192.168.0.100",
-   "username": "admin",
-   "password": "password",
+   "ip": input("Please Give me your IP: "),
+   "username": input("Please Give me your Username: "),
+   "password": getpass(),
    "port": "443",
 }
 
@@ -115,7 +126,7 @@ payload = {
  }
 
 requests.packages.urllib3.disable_warnings()
-response = requests.post(url, headers=headers, data=json.dumps(payload), auth=(device['username'], device['password']), verify=False)
+response = requests.post(url, headers=headers, data=json.dumps(payload), auth=(device['username'], device['password']), verify = False)
 
 if (response.status_code == 201):
    print("Successfully added interface")
@@ -155,7 +166,7 @@ import requests
 import urllib3
 import json
 
-ip_address = '192.168.0.100'
+ip_address = '192.168.0.111'
 interface = 'GigabitEthernet1'
 username = 'admin'
 password = 'password'
