@@ -14,7 +14,7 @@ def get_token():
     Authenticate and get token
     """
 
-    url = 'https://%s:55443/api/v1/auth/token-services' % ip_address
+    url = 'https://%s:443/api/v1/auth/token-services' % ip_address
     auth = (username, password) 
     headers = {'Content-Type':'application/json'}
     response = requests.post(url, auth=auth, headers=headers, verify=False)

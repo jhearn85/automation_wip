@@ -1,0 +1,27 @@
+
+---
+- name: IOS Show Commands 
+  hosts: "ios"
+  gather_facts: false
+  connection: network_cli
+
+  vars:
+    cli:
+      host: "ios01"
+      username: "admin"
+      password: "password"
+      transport: cli
+
+  tasks:
+    - name: ios show commands
+      ios_command:
+        commands: 
+          - show version | i IOS
+          - show run | i hostname
+        provider: "{{ cli }}"
+
+      register: output
+
+    - name: show output in output["end_state"]["contact"]
+      debug:
+          var: output    

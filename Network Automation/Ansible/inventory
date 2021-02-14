@@ -1,0 +1,7 @@
+
+[ios]
+ios01
+[ios:vars]
+ansible_network_os=cisco.ios.ios
+ansible_user=admin
+ansible_password=password
