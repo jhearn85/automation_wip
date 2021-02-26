@@ -130,8 +130,12 @@ response = requests.post(url, headers=headers, data=json.dumps(payload), auth=(d
 
 if (response.status_code == 201):
    print("Successfully added interface")
-else:
-   print("Issue with adding interface")
+elif (response.status_code == 400):
+   print("400 - Bad Request")
+elif (response.status_code == 401):
+   print("401 - Unauthorized")
+elif (response.status_code == 404):
+   print("401 - Not Found")
     
 
 
@@ -142,10 +146,6 @@ interfaces = response['ietf-interfaces:interfaces']['interface']
 for interface in interfaces:
    if bool(interface['ietf-ip:ipv4']): #check if IP address is available
       print(f"{interface['name']} -- {interface['description']} -- {interface['ietf-ip:ipv4']['address'][0]['ip']}")
-
-
-
-
 
 
 
