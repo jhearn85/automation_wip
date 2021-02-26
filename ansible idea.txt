@@ -1,0 +1,48 @@
+Ansible Idea:
+
+Ansible Playbook pulling backups from all important devices and commiting to git repo for change control and no file pollution
+
+package into script/shell command and attach to windows task scheduler on server
+	open WSL
+		run from directory
+maybe define tasks with python
+
+
+
+https://www.trueneutral.eu/2019/ansible-cfg-git.html
+
+- name: FETCH CONFIGURATION FROM N9K DEVICES
+  hosts: n9k
+  tags: fetch
+
+  tasks:
+    - name: get nxos facts via ssh
+      nxos_facts:
+        gather_subset:
+          - config
+
+    - name: save running-config to file
+      local_action: copy content={{ ansible_net_config }} dest={{ local_git_repo_path }}/{{ ansible_net_hostname }}.txt
+
+- name: COMMIT CONFIGURATION CHANGES TO GIT
+  hosts: localhost
+  connection: local
+  tags: git
+
+  tasks:
+    - name: remove commented lines with timestamps
+      # Cisco/NXOS specific - avoid timestamp from always marking config as changed
+      shell: |
+        sed -i -e '/^!Time/d' {{ local_git_repo_path }}/*.txt
+      args:
+        warn: no
+
+    - name: commit changes to git
+      shell: |
+        git add .
+        git commit -m "Config snapshot taken $(date +"%Y-%m-%d %H:%M:%S")"
+        # Needed as git commit will fail if there are no changed files
+        exit 0
+      args:
+        chdir: "{{ local_git_repo_path }}"
+
