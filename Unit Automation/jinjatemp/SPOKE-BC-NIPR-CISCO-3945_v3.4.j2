@@ -98,6 +98,7 @@ shape average 50000000 500000 500000
 service-policy BLACK-POLICY-EGRESS-QUEUING
 policy-map BLACK-POLICY-EGRESS-SHAPING-14MB
 class class-default
+
 shape average 14000000 140000 140000
 service-policy BLACK-POLICY-EGRESS-QUEUING
 policy-map BLACK-POLICY-EGRESS-SHAPING-8MB
@@ -197,6 +198,7 @@ crypto ikev2 profile DMVPN-CERT-PROFILE
  pki trustpoint 1mardivdm.usmc.mil-CA
  pki trustpoint 1mardivdm.usmc.mil-CA-ENTERPRISE
 !
+
 crypto ikev2 diagnose error 100
 crypto ikev2 certificate-cache 100
 !
@@ -295,6 +297,7 @@ interface Tunnel1300
  tunnel vrf bc
  tunnel protection ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2 shared
 !
+
 no interface Tunnel13000
 interface Tunnel13000
  description *DNOC-MCEN-NIPR-CERT-DMVPN*
@@ -394,6 +397,7 @@ network 0.0.0.0
   !
   af-interface Po{{ third_octet }}.{{ third_octet }}
    no passive-interface
+
   exit-af-interface
   !
   af-interface Tunnel1300
