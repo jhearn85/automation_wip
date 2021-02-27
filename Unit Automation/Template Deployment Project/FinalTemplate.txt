@@ -98,6 +98,7 @@ shape average 50000000 500000 500000
 service-policy BLACK-POLICY-EGRESS-QUEUING
 policy-map BLACK-POLICY-EGRESS-SHAPING-14MB
 class class-default
+
 shape average 14000000 140000 140000
 service-policy BLACK-POLICY-EGRESS-QUEUING
 policy-map BLACK-POLICY-EGRESS-SHAPING-8MB
@@ -197,6 +198,7 @@ crypto ikev2 profile DMVPN-CERT-PROFILE
  pki trustpoint 1mardivdm.usmc.mil-CA
  pki trustpoint 1mardivdm.usmc.mil-CA-ENTERPRISE
 !
+
 crypto ikev2 diagnose error 100
 crypto ikev2 certificate-cache 100
 !
@@ -295,6 +297,7 @@ interface Tunnel1300
  tunnel vrf bc
  tunnel protection ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2 shared
 !
+
 no interface Tunnel13000
 interface Tunnel13000
  description *DNOC-MCEN-NIPR-CERT-DMVPN*
@@ -394,6 +397,7 @@ network 0.0.0.0
   !
   af-interface Po32.32
    no passive-interface
+
   exit-af-interface
   !
   af-interface Tunnel1300
@@ -580,6 +584,28 @@ logging trap informational
 logging console notifications
 logging source-interface Tunnel1300
 !
+banner login ^
+You are accessing a U.S. Government (USG) Information System (IS) that is
+provided for USG-authorized use only. By using this IS (which includes any
+device attached to this IS), you consent to the
+following conditions:
+-The USG routinely intercepts and monitors communications on this IS for
+purposes including, but not limited to, penetration testing, COMSEC monitoring,
+network operations and defense, personnel misconduct (PM), law enforcement
+(LE), and counterintelligence (CI) investigations.
+-At any time, the USG may inspect and seize data stored on this IS.
+-Communications using, or data stored on, this IS are not private, are subject to
+routine monitoring, interception, and search, and may be disclosed or used for
+any USG-authorized purpose.
+-This IS includes security measures (e.g., authentication and access controls) to
+protect USG interests--not for your personal benefit or privacy.
+-Notwithstanding the above, using this IS does not constitute consent to PM, LE
+or CI investigative searching or monitoring of the content of privileged
+communications, or work product, related to personal representation or services
+by attorneys,
+psychotherapists, or clergy, and their assistants. Such communications and work
+product are private and confidential. See User Agreement for details.
+^
 !
 ip domain-name 1mardivdm.usmc.mil
 no ip domain-lookup 

@@ -43,3 +43,4 @@ def welcome_script():
     ).lower()
     if verification != "y":
         print("Exiting Script, please try again")
+        quit()

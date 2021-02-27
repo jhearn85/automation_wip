@@ -23,18 +23,16 @@ def user_unit():
     # retrieves user input and formats to match dict check - stores unit name and IP into variables
     while unit_code not in unit_codes:
         unit_code = input(
-            "Please enter your unit code (Please use -- xMARxBN -- format: "
+            "Please enter your unit code (Please use -- xMARxBN -- format): "
         ).upper()
         print("\n")
         if unit_code in unit_codes:
             unit_ip = unit_codes.get(unit_code)
         else:
             time.sleep(1)
-            print("\n")
-            print("**********************************************")
+            print("\n**********************************************")
             print("Please enter a value in the specificed format!")
-            print("**********************************************")
-            print("\n")
+            print("**********************************************\n")
             time.sleep(3)
 
     print("************************************\n")
@@ -43,3 +41,7 @@ def user_unit():
     ).lower()
     if verification != "y":
         print("Exiting Script, please try again")
+        for i in range(3):
+            print("!")
+            time.sleep(0.5)
+        quit()

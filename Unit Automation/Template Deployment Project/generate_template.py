@@ -3,6 +3,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from netmiko import ConnectHandler
 from datetime import datetime
+import time
 import os.path
 
 
@@ -15,8 +16,7 @@ def template_configure(templatetype, ip):
     with open("FinalTemplate.txt", "w") as New_Template:
         New_Template.write(output)
         New_Template.close()
-    print("\n")
-    print("**********************************")
+    print("\n**********************************")
     print("Creating Template, please standby.")
     for i in range(5):
         time.sleep(0.5)

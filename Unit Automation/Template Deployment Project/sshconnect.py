@@ -14,7 +14,7 @@ def sshconnect(device):
     try:
         with ConnectHandler(**device) as conn:
             print("Attempting configuration transfer - Please be patient")
-            conn.send_config_from_file(cfg_file, delay_factor=5)
+            conn.send_command("show int desc", delay_factor=5)
             conn.save_config()
             for i in range(5):
                 time.sleep(0.5)
@@ -24,8 +24,7 @@ def sshconnect(device):
     except NetMikoAuthenticationException:
         print(f"Connection to Device {device['ip']} failed.")
     except NetMikoTimeoutException:
-        print("\n")
-        print("        *********************************")
+        print("\n        *********************************")
         print("        *            ERROR              *")
         print("        *********************************")
         print("Device Timeout - Please valid SSH connectivity and try again! ")

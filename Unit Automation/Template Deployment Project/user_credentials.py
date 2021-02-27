@@ -7,14 +7,12 @@ from getpass import getpass
 
 def User_Credentials():
     global device
-    print("\n\n")
     time.sleep(2)
     ssh_reachable = input(
-        "Is the Device to be Configured reachable via SSH on this computer(Y/n): "
+        "\n\nIs the Device to be Configured reachable via SSH on this computer(Y/n): "
     ).lower()
     if ssh_reachable != "y":
-        print("\n")
-        print("Please do xxxxxxx to configure SSH and retry this Wizard!")
+        print("\nPlease do xxxxxxx to configure SSH and retry this Wizard!")
         quit()
     device = {
         "ip": "temp",
@@ -31,20 +29,20 @@ def User_Credentials():
         device["ip"] = input("Please input a valid IP: ")
         IP_Validity = bool((re.search(regex, device["ip"])))
         if IP_Validity:
-            print(device["ip"])
+            print("Verifying IP...\n")
+            time.sleep(1)
+            print("IP Verified!\n")
         else:
             time.sleep(2)
-            print("\n")
             print(
-                "*************************************************************************"
+                "\n*************************************************************************"
             )
             print(
                 "Malformed input! Please enter a valid IP and try again! (Eg: 192.168.0.1) "
             )
             print(
-                "*************************************************************************"
+                "*************************************************************************\n"
             )
-            print("\n")
 
     # USERNAME PULL
     device["username"] = input("What is the device's local username: ")
@@ -59,15 +57,13 @@ def User_Credentials():
 
     # PASSWORD PULL
     time.sleep(1)
-    print("\n")
     print(
-        " ******************************************************************************* "
+        " \n******************************************************************************* "
     )
     print(
         "*Your Password will NOT be visible for security, ensure it is entered correctly!*"
     )
     print(
-        " ******************************************************************************* "
+        " ******************************************************************************* \n"
     )
-    print("\n")
     device["password"] = getpass()
