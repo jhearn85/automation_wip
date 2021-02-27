@@ -2,7 +2,9 @@ import time
 
 
 #takes user input and compares against dictionary of unit -> IP mappings
+unit_ip =''
 def user_unit():
+    global unit_ip
     time.sleep(1)
     unit_code=''
     unit_codes = {

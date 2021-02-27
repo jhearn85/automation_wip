@@ -2,8 +2,10 @@ import time
 
 
 #Registers users input and defines the template to use for jinja2 -> final device template
-def welcome_script():
 
+Device_Template = ''
+def welcome_script():
+    global Device_Template
     print("*************************************************")
     print("Welcome to the Unit Template Configuration Engine")
     print("*************************************************")
@@ -17,7 +19,7 @@ def welcome_script():
         print("*************************************************")
         Device_Type = input(f"What type of Device are you configuring?\nA - {devices['a']}\nB - {devices['b']}\nC - {devices['c']}\n\nPlease Select: ").lower()
         if Device_Type == 'a':
-            Device_Template = "SPOKE-BC-NIPR-CISCO-3945_v3.4.j2"
+            Device_Template = 'SPOKE-BC-NIPR-CISCO-3945_v3.4.j2'
         elif Device_Type == 'b':
             Device_Template = "placeholder"
         elif Device_Type == 'c':
@@ -31,4 +33,3 @@ def welcome_script():
     verification = input(f"Please verify you are working on a {devices[Device_Type]}(Y/n): ").lower() 
     if verification != 'y':
         print("Exiting Script, please try again")
-    
