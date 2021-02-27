@@ -6,14 +6,10 @@ from datetime import datetime
 import os.path
 from unit_match import *
 from unit_welcome import *
-from netmiko import ConnectHandler
-from netmiko.ssh_exception import (
-    NetMikoAuthenticationException,
-    NetMikoTimeoutException,
-)
+from getpass import getpass
 
 
-def main(templatetype, ip):
+def template_configure(templatetype, ip):
     file_loader = FileSystemLoader('.')
     env = Environment(loader=file_loader)
     template = env.get_template(templatetype)
@@ -22,6 +18,13 @@ def main(templatetype, ip):
     with open("FinalTemplate.txt", "w") as New_Template:
         New_Template.write(output)
         New_Template.close()
+    print("\n")
+    print("**********************************")
+    print("Creating Template, please standby.")
+    for i in range(5):
+        time.sleep(.5)
+        print(".")
+    print("Template Created Successfully, file saved as 'FinalTemplate.txt'")
 
 #Create start time variable to view runtime
 start_time = datetime.now()
@@ -37,48 +40,9 @@ start_time = datetime.now()
 
 
 
-
-# def function to connect with netmiko framework defined per ip
-def send_cmd(device):
-    cfg_file = "FinalTemplate.txt"
-    try:
-        with ConnectHandler(**device) as conn:
-            conn.send_config_from_file(cfg_file)
-            conn.save_config()
-            print(f"Configuration of device Successful")
-    except NetMikoAuthenticationException:
-        print(f"Connection to Device {device['ip']} failed.")
-    except:
-        pass
-
-
-
-def devices():
-        device = {
-            "ip": user_ip_address,
-            "username": user_username,
-            "password": user_password,
-        }
-
-
-
 if __name__ == "__main__":
     welcome_script()
     from unit_welcome import Device_Template
     user_unit()
     from unit_match import unit_ip
-    main(Device_Template, unit_ip)
-    print("\n")
-    print("**********************************")
-    print("Creating Template, please standby.")
-    for i in range(5):
-        time.sleep(.5)
-        print(".")
-    print("Template Created Successfully, file saved as 'FinalTemplate.txt'")
-    print("\n\n")
-    time.sleep(2)
-    ssh_reachable=input("Is the Device to be Configured reachable via SSH on this computer(Y/n): ").lower()
-    if ssh_reachable != "y":
-        print("Please do xxxxxxx to configure SSH and retry this Wizard!")
-        exit
-    
+    template_configure(Device_Template, unit_ip)
