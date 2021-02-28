@@ -25,7 +25,7 @@ def User_Credentials():
     regex = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"  # IP Regex check
     IP_Validity = False
     # while loop to check IP validity
-    while IP_Validity == False:
+    while not IP_Validity:
         device["ip"] = input("Please input a valid IP: ")
         IP_Validity = bool((re.search(regex, device["ip"])))
         if IP_Validity:
@@ -35,13 +35,7 @@ def User_Credentials():
         else:
             time.sleep(2)
             print(
-                "\n*************************************************************************"
-            )
-            print(
-                "Malformed input! Please enter a valid IP and try again! (Eg: 192.168.0.1) "
-            )
-            print(
-                "*************************************************************************\n"
+                "\n*************************************************************************\nMalformed input! Please enter a valid IP and try again! (Eg: 192.168.0.1) \n*************************************************************************\n"
             )
 
     # USERNAME PULL
@@ -58,12 +52,6 @@ def User_Credentials():
     # PASSWORD PULL
     time.sleep(1)
     print(
-        " \n******************************************************************************* "
-    )
-    print(
-        "*Your Password will NOT be visible for security, ensure it is entered correctly!*"
-    )
-    print(
-        " ******************************************************************************* \n"
+        " \n ******************************************************************************* \n*Your Password will NOT be visible for security, ensure it is entered correctly!*\n ******************************************************************************* "
     )
     device["password"] = getpass()

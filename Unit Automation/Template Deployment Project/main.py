@@ -22,7 +22,6 @@ if __name__ == "__main__":
     user_unit()
     #Based on Fiber
     from unit_match import replacement_dictionary
-    print(replacement_dictionary)
     fiber_template_configure(Device_Template, replacement_dictionary)
     User_Credentials()
     from user_credentials import device
