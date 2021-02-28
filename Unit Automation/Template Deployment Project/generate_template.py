@@ -7,11 +7,11 @@ import time
 import os.path
 
 
-def template_configure(templatetype, ip):
+def fiber_template_configure(templatetype, replacement_dictionary):
     file_loader = FileSystemLoader(".")
     env = Environment(loader=file_loader)
     template = env.get_template(templatetype)
-    output = template.render(third_octet=ip)
+    output = template.render(**replacement_dictionary)
 
     with open("FinalTemplate.txt", "w") as New_Template:
         New_Template.write(output)

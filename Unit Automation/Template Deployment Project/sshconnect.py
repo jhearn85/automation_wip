@@ -14,7 +14,7 @@ def sshconnect(device):
     try:
         with ConnectHandler(**device) as conn:
             print("Attempting configuration transfer - Please be patient")
-            conn.send_command("show int desc", delay_factor=5)
+            conn.send_config_from_file(cfg_file, delay_factor=5)
             conn.save_config()
             for i in range(5):
                 time.sleep(0.5)
