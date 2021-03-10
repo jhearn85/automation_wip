@@ -1,14 +1,35 @@
-from user_credentials import User_Credentials
-import ipaddress
 import re
-from datetime import datetime
 import time
-from getpass import getpass
+from value_check import regex_check
 
-User_Credentials()
-from user_credentials import device
+replacement_dictionary = {
+    "unit_ip" : "",
+    "ssh_port" : "",
+    "external_vlan" : "",
+    "external_port" : "",
+    "taclane_port" : "",
+    "ports_to_router" : [],
+    "ports_to_cs" : [],
+    "access_ports" : ""
+    
+}
+
+external_port = input("\nWhat Device Port will be connected to your external fiber? \nGive in standard Format (G0/0, G0/1, etc)): ")
+
+regex_check(external_port, replacement_dictionary, "external_port")
+print(replacement_dictionary["external_port"])
+print("test")
 
 
-from sshconnect import sshconnect
-sshconnect(device)
-print(device)
+
+
+
+
+class topology:
+    def __init__(self, devices, connections):
+        self.devices = devices
+        self.connections = connections
+    def topfunc(self):
+        print("test")
+
+top = topology("router", "")

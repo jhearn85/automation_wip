@@ -12,7 +12,17 @@ def User_Credentials():
         "\n\nIs the Device to be Configured reachable via SSH on this computer(Y/n): "
     ).lower()
     if ssh_reachable != "y":
-        print("\nPlease do xxxxxxx to configure SSH and retry this Wizard!")
+        print("\nPlease input these command on target device and retry this Wizard!")
+        print("""\n 
+hostname _______
+username _______ priv 15 secret ________
+ip domain-name usmc.mil
+crypto key gen rsa label ssh-rsa modulus 2048
+ip ssh version 2
+ip ssh rsa key ssh-rsa
+line vty 0 15
+login local
+        """)
         quit()
     device = {
         "ip": "temp",

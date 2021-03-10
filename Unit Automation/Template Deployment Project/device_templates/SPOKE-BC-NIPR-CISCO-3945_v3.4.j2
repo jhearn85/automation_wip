@@ -1,9 +1,9 @@
 
 !
 ip access-list standard SIPR-HAIPE-CT-IP-ACL
-permit 10.101.{{ third_octet }}.254 0.0.0.0
+permit 10.101.{{ unit_ip }}.254 0.0.0.0
 ip access-list standard NIPR-HAIPE-CT-IP-ACL
-permit 10.255.255.{{ third_octet }} 0.0.0.0
+permit 10.255.255.{{ unit_ip }} 0.0.0.0
 !
 class-map match-all IMEF-BC-SIPR-VOICE-CLASS
 description Assured Voice & Non-Assured Voice from SIPR HAIPE
@@ -147,18 +147,18 @@ aaa session-id common
 !
 crypto pki trustpoint 1mardivdm.usmc.mil-CA
  enrollment url http://10.16.145.3:80
- fqdn DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
- subject-name CN=DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
+ fqdn DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
+ subject-name CN=DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
  vrf bc
  revocation-check none
  rsakeypair IKEV2-DMVPN
 !
 crypto pki trustpoint 1mardivdm.usmc.mil-CA-ENTERPRISE
  enrollment terminal pem
- fqdn DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
+ fqdn DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
  fingerprint 585A0AB86CAE19B35DFB70F237F2C66011056701
- subject-name CN=DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
- subject-alt-name DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
+ subject-name CN=DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
+ subject-alt-name DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
  revocation-check none
  rsakeypair IKEV2-DMVPN
 !
@@ -192,7 +192,7 @@ crypto ikev2 policy DMVPN-CERT-POLICY
 crypto ikev2 profile DMVPN-CERT-PROFILE
  match fvrf bc
  match identity remote fqdn domain 1mardivdm.usmc.mil
- identity local fqdn DIV-{{ third_octet }}-N-RTR.1mardivdm.usmc.mil
+ identity local fqdn DIV-{{ unit_ip }}-N-RTR.1mardivdm.usmc.mil
  authentication local rsa-sig
  authentication remote rsa-sig
  pki trustpoint 1mardivdm.usmc.mil-CA
@@ -212,25 +212,25 @@ crypto ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2
 !
 !
 ip dhcp pool TACTICAL_USERS
- network 137.232.{{ third_octet }}.0 255.255.255.128
+ network 137.232.{{ unit_ip }}.0 255.255.255.128
  domain-name 1mardivdm.usmc.mil
- dns-server 137.232.{{ third_octet }}.194 137.232.{{ third_octet }}.195 137.232.58.98
- default-router 137.232.{{ third_octet }}.1
+ dns-server 137.232.{{ unit_ip }}.194 137.232.{{ unit_ip }}.195 137.232.58.98
+ default-router 137.232.{{ unit_ip }}.1
  option 150 ip 137.232.58.104
 
 
 ip dhcp pool TACTICAL_VOICE
- network 137.232.{{ third_octet }}.128 255.255.255.224
+ network 137.232.{{ unit_ip }}.128 255.255.255.224
  domain-name 1mardivdm.usmc.mil
- dns-server 137.232.{{ third_octet }}.194 137.232.{{ third_octet }}.195 137.232.58.98
- default-router 137.232.{{ third_octet }}.129
+ dns-server 137.232.{{ unit_ip }}.194 137.232.{{ unit_ip }}.195 137.232.58.98
+ default-router 137.232.{{ unit_ip }}.129
  option 150 ip 137.232.58.104
 
 ip dhcp pool TACTICAL_ADMINS
- network 137.232.{{ third_octet }}.216 255.255.255.248
+ network 137.232.{{ unit_ip }}.216 255.255.255.248
  domain-name 1mardivdm.usmc.mil
- dns-server 137.232.{{ third_octet }}.194 137.232.{{ third_octet }}.195 137.232.58.98
- default-router 137.232.{{ third_octet }}.217
+ dns-server 137.232.{{ unit_ip }}.194 137.232.{{ unit_ip }}.195 137.232.58.98
+ default-router 137.232.{{ unit_ip }}.217
  option 150 ip 137.232.58.104
 
 !
@@ -247,39 +247,56 @@ ip multicast-routing vrf bc
 !
 interface Loopback250
  description *MANAGEMENT*
- ip address 137.232.{{ third_octet }}.250 255.255.255.255
+ ip address 137.232.{{ unit_ip }}.250 255.255.255.255
 !
 interface Loopback10
  description *NIPR-DMVPN-Tunnel-Source*
  vrf forwarding bc
- ip address 10.30.{{ third_octet }}.255 255.255.255.255
+ ip address 10.30.{{ unit_ip }}.255 255.255.255.255
 !
-interface Po{{ third_octet }}
- description ***MGMT***
+{% if ports_to_cs != "" %}
+  interface Po{{ unit_ip }}
+    description ***MGMT***
 !
+  interface po{{ unit_ip }}.175
+    vrf forwarding bc
+    encapsulation dot1q 175
+    ip address 10.101.{{ unit_ip }}.254 255.255.255.252
+    no shutdown
 !
-interface Po{{ third_octet }}.101
- bandwidth 2048
- description ***CONNECTION TO VSAT***
- vrf for linkway
- ip pim sparse-mode
- ip add 10.101.{{ third_octet }}.2 255.255.255.252
- service-policy output BLACK-POLICY-LINKWAY-EGRESS-SHAPING
- no shutdown
+  interface po{{ unit_ip }}.59
+    vrf forwarding bc
+    encapsulation dot1q 59
+    ip address 10.101.59.{{ unit_ip }} 255.255.255.0
+    no shutdown
+  !
+  interface Po{{ unit_ip }}.30{{ unit_ip }}
+    description ***MANAGEMENT***
+    encapsulation dot1q 30{{ unit_ip }}
+    ip address 10.30.{{ unit_ip }}.11 255.255.255.0
+    ip pim sparse-mode
 !
-interface Po{{ third_octet }}.175
- description ***SIPR Taclane CT***
- vrf for bc
- ip pim sparse-mode
- ip add 10.101.{{ third_octet }}.253 255.255.255.252
- no shutdown
+{% for int in ports_to_cs %}
+  interface {{ int }}
+  channel-group {{ unit_ip }} mode on
 !
+{% if external_port != "" %}
+  interface {{ external_port }}
+    vrf forwarding bc
+    ip address 10.101.59.{{ unit_ip }} 255.255.255.0
+    no shutdown
+!
+{% if taclane_port != "" %}
+  interface {{ sipr_port }}
+    vrf forwarding bc
+    ip address 10.101.{{ unit_ip }}.254 255.255.255.252
+    no shutdown
 !
 no interface Tunnel1300
 interface Tunnel1300
  description *DNOC-TAC-NIPR-CERT-DMVPN*
  bandwidth 2048
- ip address 10.10.30.{{ third_octet }} 255.255.255.0
+ ip address 10.10.30.{{ unit_ip }} 255.255.255.0
  no ip redirects
  ip pim sparse-mode
  ip mtu 1420
@@ -303,7 +320,7 @@ interface Tunnel13000
  description *DNOC-MCEN-NIPR-CERT-DMVPN*
  bandwidth 2048
  vrf forwarding mcen
- ip address 10.10.30.{{ third_octet }} 255.255.255.0
+ ip address 10.10.30.{{ unit_ip }} 255.255.255.0
  no ip redirects
  ip mtu 1420
  ip pim sparse-mode
@@ -322,60 +339,7 @@ interface Tunnel13000
  tunnel protection ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2 shared
 !
 !
-no interface Tunnel130
-interface Tunnel130
- description *DNOC-TDMA-LINKWAY-DMVPN*
- bandwidth 2048
- vrf forwarding bc
- ip address 10.10.30.{{ third_octet }} 255.255.255.0
- no ip redirects
- ip mtu 1460
- ip nhrp network-id 130
- ip nhrp shortcut
- ip tcp adjust-mss 1420
- ip nhrp nhs dynamic nbma 10.101.58.25 multicast 
- ip nhrp nhs dynamic nbma 10.101.60.25  multicast 
- delay 700
- qos pre-classify
- bfd interval 500 min_rx 500 multiplier 3
- tunnel source Po{{ third_octet }}.101
- tunnel mode gre multipoint
- tunnel key 130
- tunnel vrf linkway
- ip pim sparse-mode
-!
-no interface Tunnel131 
-interface Tunnel131 
- description *DIV-MAIN-TDMA-LINKWAY-DMVPN*
- bandwidth 2048
- vrf forwarding bc
- ip address 10.10.30.{{ third_octet }} 255.255.255.0
- no ip redirects
- ip mtu 1460
- ip nhrp network-id 131
- ip nhrp shortcut
- ip tcp adjust-mss 1420
- ip nhrp nhs dynamic nbma 10.101.57.25 multicast 
- delay 700
- qos pre-classify
- bfd interval 500 min_rx 500 multiplier 3
- tunnel source Po{{ third_octet }}.131
- tunnel mode gre multipoint
- tunnel key 131
- tunnel vrf linkway
- ip pim sparse-mode
-!
-interface GigabitEthernet2/0
- ip address 137.232.{{ third_octet }}.255 255.255.255.254
- description **BACKPLANE INTERFACE TO ES3 MODULE*
- service-policy input ENCLAVE-POLICY-INGRESS-MARKING
- no shutdown
-!
-interface Po{{ third_octet }}.30{{ third_octet }}
- description ***MANAGEMENT***
- encapsulation dot1q 30{{ third_octet }}
- ip address 10.30.{{ third_octet }}.11 255.255.255.0
- ip pim sparse-mode
+
 !
 router rip
  !
@@ -395,7 +359,7 @@ network 0.0.0.0
    passive-interface
   exit-af-interface
   !
-  af-interface Po{{ third_octet }}.{{ third_octet }}
+  af-interface Po{{ unit_ip }}.{{ unit_ip }}
    no passive-interface
 
   exit-af-interface

@@ -1,442 +1,18 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!
-ip access-list standard SIPR-HAIPE-CT-IP-ACL
-permit 10.101.32.254 0.0.0.0
-ip access-list standard NIPR-HAIPE-CT-IP-ACL
-permit 10.255.255.32 0.0.0.0
-!
-class-map match-all IMEF-BC-SIPR-VOICE-CLASS
-description Assured Voice & Non-Assured Voice from SIPR HAIPE
-match dscp cs4 41 43 45 EF 47 49
-match access-group name SIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-NIPR-VOICE-CLASS
-description Assured Voice & Non-Assured Voice from NIPR
-match dscp cs4 41 43 45 EF 47 49
-match access-group name NIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-COMMON-SIG-CLASS
-description Signaling_All Network and VoIP Signaling
-match dscp cs5 cs6
-class-map match-any IMEF-BC-VTC-CLASS-DSCP
-description Assured and Non-Assured Multimedia Conferencing
-match dscp af32 af33 af41 af42 af43
-match dscp 33 35 37 39 51
-class-map match-all IMEF-BC-SIPR-VTC-CLASS
-description Assured and Non-Assured Multimedia Conferencing from SIPR HAIPE
-match class-map IMEF-BC-VTC-CLASS-DSCP
-match access-group name SIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-NIPR-VTC-CLASS
-description Assured and Non-Assured Multimedia Conferencing from NIPR
-match class-map IMEF-BC-VTC-CLASS-DSCP
-match access-group name NIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-SIPR-STREAM-CLASS
-description Broadcast Video & Multimedia Streaming from SIPR HAIPE
-match dscp cs3 af31 25 27 29 31
-match access-group name SIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-NIPR-STREAM-CLASS
-description Broadcast Video & Multimedia Streaming from NIPR
-match dscp cs3 af31 25 27 29 31
-match access-group name NIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-COMMON-OA&M-CLASS
-description ALL OA&M Network Management traffic
-match dscp cs2
-class-map match-any IMEF-BC-MSNDATA-CLASS-DSCP
-description High Throughput & Low-Latency Data
-match dscp af21 af22 af23
-match dscp 9 11 13 15 17 19 21 23
-class-map match-all IMEF-BC-SIPR-MSNDATA-CLASS
-description Business & Mission Important Data from SIPR HAIPE
-match class-map IMEF-BC-MSNDATA-CLASS-DSCP
-match access-group name SIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-NIPR-MSNDATA-CLASS
-description Business & Mission Important Data from NIPR HAIPE
-match class-map IMEF-BC-MSNDATA-CLASS-DSCP
-match access-group name NIPR-HAIPE-CT-IP-ACL
-class-map match-all IMEF-BC-COMMON-SCAV-CLASS
-description All Scavenger Traffic
-match dscp cs1
-class-map match-all IMEF-BC-SIPR-DEFAULT-CLASS
-description Default queue for traffic from SIPR HAIPE
-match access-group name SIPR-HAIPE-CT-IP-ACL
-!
-policy-map BLACK-POLICY-EGRESS-QUEUING
-class IMEF-BC-SIPR-VOICE-CLASS 
- priority percent 15
-class IMEF-BC-NIPR-VOICE-CLASS
- priority percent 15
-class IMEF-BC-COMMON-SIG-CLASS
- bandwidth remaining percent 4
-class IMEF-BC-SIPR-VTC-CLASS
- bandwidth remaining percent 20
-class IMEF-BC-SIPR-STREAM-CLASS
- bandwidth remaining percent 10
-class IMEF-BC-SIPR-MSNDATA-CLASS
- bandwidth remaining percent 20
-random-detect dscp-based
-class IMEF-BC-NIPR-MSNDATA-CLASS
- bandwidth remaining percent 10
-random-detect dscp-based
-class IMEF-BC-COMMON-OA&M-CLASS
-bandwidth remaining percent 4
-class IMEF-BC-COMMON-SCAV-CLASS
-bandwidth remaining percent 1
-class IMEF-BC-SIPR-DEFAULT-CLASS
- bandwidth remaining percent 15
-random-detect dscp-based
-class IMEF-BC-NIPR-STREAM-CLASS
- bandwidth remaining percent 5
-class class-default bandwidth
- remaining percent 10
-random-detect dscp-based
-!
-policy-map BLACK-POLICY-EGRESS-SHAPING-100MB
-class class-default
-shape average 100000000 1000000 1000000
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-50MB
-class class-default
-shape average 50000000 500000 500000
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-14MB
-class class-default
+Spoke Template Version 1.1 - 20200504 - Cpl Allevato 
+(RFC) CLR 1 FTD
+-------------------------------------------------------------
+type CTRL+H
 
-shape average 14000000 140000 140000
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-8MB
-class class-default
-shape average 8192000 81920 81920
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-6MB
-class class-default
-shape average 6144000 61440 61440
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-4MB
-class class-default
-shape average 4096000 40960 40960
-!
-service-policy BLACK-POLICY-EGRESS-QUEUING
-policy-map BLACK-POLICY-EGRESS-SHAPING-2MB
-class class-default
-shape average 2048000 20480 20480
-service-policy BLACK-POLICY-EGRESS-QUEUING
-
-policy-map BLACK-POLICY-EGRESS-SHAPING-1MB
-class class-default
-shape average 1024000 10240 10240
-service-policy BLACK-POLICY-EGRESS-QUEUING
-!
-policy-map BLACK-POLICY-LINKWAY-EGRESS-SHAPING
-class class-default 
-shape average 3008000 30080 30080 
-service-policy BLACK-POLICY-EGRESS-QUEUING
-!
-crypto key generate rsa mod 2048 label IKEV2-DMVPN
-!
-crypto key generate rsa label ssh-rsa modulus 2048
-!
-ntp server vrf bc 10.16.48.121 prefer
-ntp server vrf bc 10.20.5.121 
-ntp server 137.232.58.123
-ntp server 137.232.60.123
-!
-clock timezone PST -8 0
-clock summer-time PST recurring
-service timestamps log datetime localtime
-!
-!
-aaa session-id common
-!
-crypto pki trustpoint 1mardivdm.usmc.mil-CA
- enrollment url http://10.16.145.3:80
- fqdn DIV-32-N-RTR.1mardivdm.usmc.mil
- subject-name CN=DIV-32-N-RTR.1mardivdm.usmc.mil
- vrf bc
- revocation-check none
- rsakeypair IKEV2-DMVPN
-!
-crypto pki trustpoint 1mardivdm.usmc.mil-CA-ENTERPRISE
- enrollment terminal pem
- fqdn DIV-32-N-RTR.1mardivdm.usmc.mil
- fingerprint 585A0AB86CAE19B35DFB70F237F2C66011056701
- subject-name CN=DIV-32-N-RTR.1mardivdm.usmc.mil
- subject-alt-name DIV-32-N-RTR.1mardivdm.usmc.mil
- revocation-check none
- rsakeypair IKEV2-DMVPN
-!
-username dnocadmin privilege 15 secret 5 $1$3rmn$ulWkDfy8FpxUd7k1LA14x1
-!
-vrf definition bc
- !
- address-family ipv4
- exit-address-family
-!
-vrf definition linkway
- !
- address-family ipv4
- exit-address-family
-!
-vrf definition mcen
- !
- address-family ipv4
- exit-address-family
-!
-crypto ikev2 proposal DMVPN-CERT-PROPOSAL 
- encryption aes-gcm-256 aes-gcm-128
- prf sha512
- group 20
-!
-crypto ikev2 policy DMVPN-CERT-POLICY 
- match fvrf any
- proposal DMVPN-CERT-PROPOSAL
-!
-!
-crypto ikev2 profile DMVPN-CERT-PROFILE
- match fvrf bc
- match identity remote fqdn domain 1mardivdm.usmc.mil
- identity local fqdn DIV-32-N-RTR.1mardivdm.usmc.mil
- authentication local rsa-sig
- authentication remote rsa-sig
- pki trustpoint 1mardivdm.usmc.mil-CA
- pki trustpoint 1mardivdm.usmc.mil-CA-ENTERPRISE
-!
-
-crypto ikev2 diagnose error 100
-crypto ikev2 certificate-cache 100
-!
-!
-crypto ipsec transform-set ESP-AES256 esp-aes 256 esp-sha512-hmac 
- mode transport
-!
-crypto ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2
- set transform-set ESP-AES256 
- set ikev2-profile DMVPN-CERT-PROFILE
-!
-!
-ip dhcp pool TACTICAL_USERS
- network 137.232.32.0 255.255.255.128
- domain-name 1mardivdm.usmc.mil
- dns-server 137.232.32.194 137.232.32.195 137.232.58.98
- default-router 137.232.32.1
- option 150 ip 137.232.58.104
+Replace 32 with network third octet assigned by Division
+Check the Master IP cutsheet for your MCEN IP's
 
 
-ip dhcp pool TACTICAL_VOICE
- network 137.232.32.128 255.255.255.224
- domain-name 1mardivdm.usmc.mil
- dns-server 137.232.32.194 137.232.32.195 137.232.58.98
- default-router 137.232.32.129
- option 150 ip 137.232.58.104
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!NIPR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-ip dhcp pool TACTICAL_ADMINS
- network 137.232.32.216 255.255.255.248
- domain-name 1mardivdm.usmc.mil
- dns-server 137.232.32.194 137.232.32.195 137.232.58.98
- default-router 137.232.32.217
- option 150 ip 137.232.58.104
-
-!
-ip dhcp pool MCEN
- vrf mcen
-!!!!Contact G6 to Request MCEN Subnet!!!!
- dns-server 158.238.240.249 158.238.240.248 
- domain-name pndl.mcdsus.mcds.usmc.mil
- option 150 ip 158.238.202.18 
-!
-
-ip multicast-routing
-ip multicast-routing vrf bc
-!
-interface Loopback250
- description *MANAGEMENT*
- ip address 137.232.32.250 255.255.255.255
-!
-interface Loopback10
- description *NIPR-DMVPN-Tunnel-Source*
- vrf forwarding bc
- ip address 10.30.32.255 255.255.255.255
-!
-interface Po32
- description ***MGMT***
-!
-!
-interface Po32.101
- bandwidth 2048
- description ***CONNECTION TO VSAT***
- vrf for linkway
- ip pim sparse-mode
- ip add 10.101.32.2 255.255.255.252
- service-policy output BLACK-POLICY-LINKWAY-EGRESS-SHAPING
- no shutdown
-!
-interface Po32.175
- description ***SIPR Taclane CT***
- vrf for bc
- ip pim sparse-mode
- ip add 10.101.32.253 255.255.255.252
- no shutdown
-!
-!
-no interface Tunnel1300
-interface Tunnel1300
- description *DNOC-TAC-NIPR-CERT-DMVPN*
- bandwidth 2048
- ip address 10.10.30.32 255.255.255.0
- no ip redirects
- ip pim sparse-mode
- ip mtu 1420
- ip nhrp authentication 1300
- ip nhrp network-id 1300
- ip nhrp nhs dynamic nbma 10.16.48.10 multicast
- ip nhrp nhs dynamic nbma 10.20.5.10 multicast
- ip tcp adjust-mss 1380
- delay 700
- qos pre-classify
- bfd interval 1000 min_rx 1000 multiplier 3
- tunnel source Loopback10
- tunnel mode gre multipoint
- tunnel key 1300
- tunnel vrf bc
- tunnel protection ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2 shared
-!
-
-no interface Tunnel13000
-interface Tunnel13000
- description *DNOC-MCEN-NIPR-CERT-DMVPN*
- bandwidth 2048
- vrf forwarding mcen
- ip address 10.10.30.32 255.255.255.0
- no ip redirects
- ip mtu 1420
- ip pim sparse-mode
- ip nhrp authentication 13000
- ip nhrp network-id 13000
- ip nhrp nhs dynamic nbma 10.16.48.10 multicast
- ip nhrp nhs dynamic nbma 10.20.5.10 multicast
- ip tcp adjust-mss 1380
- delay 700
- qos pre-classify
- bfd interval 1000 min_rx 1000 multiplier 3
- tunnel source Loopback10
- tunnel mode gre multipoint
- tunnel key 13000
- tunnel vrf bc
- tunnel protection ipsec profile DMVPN-CERT-IPSEC-PROFILE-IKEV2 shared
-!
-!
-no interface Tunnel130
-interface Tunnel130
- description *DNOC-TDMA-LINKWAY-DMVPN*
- bandwidth 2048
- vrf forwarding bc
- ip address 10.10.30.32 255.255.255.0
- no ip redirects
- ip mtu 1460
- ip nhrp network-id 130
- ip nhrp shortcut
- ip tcp adjust-mss 1420
- ip nhrp nhs dynamic nbma 10.101.58.25 multicast 
- ip nhrp nhs dynamic nbma 10.101.60.25  multicast 
- delay 700
- qos pre-classify
- bfd interval 500 min_rx 500 multiplier 3
- tunnel source Po32.101
- tunnel mode gre multipoint
- tunnel key 130
- tunnel vrf linkway
- ip pim sparse-mode
-!
-no interface Tunnel131 
-interface Tunnel131 
- description *DIV-MAIN-TDMA-LINKWAY-DMVPN*
- bandwidth 2048
- vrf forwarding bc
- ip address 10.10.30.32 255.255.255.0
- no ip redirects
- ip mtu 1460
- ip nhrp network-id 131
- ip nhrp shortcut
- ip tcp adjust-mss 1420
- ip nhrp nhs dynamic nbma 10.101.57.25 multicast 
- delay 700
- qos pre-classify
- bfd interval 500 min_rx 500 multiplier 3
- tunnel source Po32.131
- tunnel mode gre multipoint
- tunnel key 131
- tunnel vrf linkway
- ip pim sparse-mode
-!
-interface GigabitEthernet2/0
- ip address 137.232.32.255 255.255.255.254
- description **BACKPLANE INTERFACE TO ES3 MODULE*
- service-policy input ENCLAVE-POLICY-INGRESS-MARKING
- no shutdown
-!
-interface Po32.3032
- description ***MANAGEMENT***
- encapsulation dot1q 3032
- ip address 10.30.32.11 255.255.255.0
- ip pim sparse-mode
-!
-router rip
- !
- address-family ipv4 vrf linkway
-  network 10.0.0.0
-  no auto-summary
-  version 2
- exit-address-family
-!
-router eigrp nipr
- !
- address-family ipv4 unicast autonomous-system 5969
-  !
-network 0.0.0.0
-  af-interface default
-   bfd
-   passive-interface
-  exit-af-interface
-  !
-  af-interface Po32.32
-   no passive-interface
-
-  exit-af-interface
-  !
-  af-interface Tunnel1300
-   no passive-interface
-  exit-af-interface
-!
- address-family ipv4 unicast vrf mcen autonomous-system 5969
-  !
-  af-interface default
-   bfd
-   passive-interface
-  exit-af-interface
-
-  !
-  af-interface Tunnel13000
-   no passive-interface
-  exit-af-interface
-  !
-  af-interface Tunnel13001
-   no passive-interface
-  exit-af-interface
-  !
-  !
-  topology base
-  network 0.0.0.0
-!
-router eigrp bc
-
-address-family ipv4 unicast vrf bc autonomous-system 65130
- network 10.0.0.0
- af-interface default 
-  bfd
-  passive-interface 
- af-interface Tunnel130
-  no passive-interface
- af-interface Tunnel131 
-  no passive-interface
-
-ip tacacs source-interface GigabitEthernet2/0
 !
 no service config 
 no service tcp-small-servers 
@@ -448,184 +24,160 @@ service tcp-keepalives-out
 service timestamps debug datetime msec localtime show-timezone
 service timestamps log datetime msec localtime show-timezone
 service password-encryption 
-!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!NIPR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
-!
-ip access-list extended STREAMING
- permit ip host <STREAMING SOURCE IP> any
-remark add new entry for each video feed (GBS FEED)
-!
-ip access-list extended VOIP-SECURE-SIGNALING-PROTOCOL-ACL
-remark MATCHES STANDARD VOIP SECURE SIGNALING PROTOCOLS WHICH NBAR CANNOT YET IDENTIFY
-remark Secure SCCP (Skinny Client Control Protocol)
-permit tcp any any eq 2443
-permit tcp any any eq 2445
-remark Secure SIP (Session Initiation Protocol)
-permit tcp any any eq 5061
-permit udp any any eq 5061
-remark CAPF (Certificate Authority Proxy Function)
-permit tcp any any eq 3804
-!
-class-map match-any VOICE-QUEUE
-description VOICE
-match dscp CS4 41 43 45 47 49 EF
-class-map match-any VOICE-MARKING
-description MARK VOICE ON INGRESS
-match protocol rtp audio
-class-map match-any SIG-QUEUE
-description SIGNALING
-match dscp CS6 CS5
-class-map match-any SIG-MARKING
-description MARK-SIGNALING ON INGRESS
-match protocol sip
-match protocol skinny
-match protocol h323
-match protocol rtcp
-match protocol cisco-phone
-match protocol mgcp
-match protocol ipsec
-match access-group name VOIP-SECURE-SIGNALING-PROTOCOL-ACL
-class-map match-any VTC-QUEUE
-description ASSURED, NONASSURED MEDIA CONF
-match dscp 33 35 37 39 51
-match dscp af32 af33 af41 af42 af43
-class-map match-any VTC-MARKING
-description MARK VTC ON INGRESS
-match protocol rtp video
-class-map match-any STREAM-QUEUE
-description STREAMING, BROADCAST VIDEO
-match dscp CS3 25 27 29 31 AF31
-class-map match-any STREAM-MARKING
-description MARK STREAMING VIDEO
-match access-group name STREAMING
-!
-class-map match-any MSNDATA-QUEUE
-description LOW LATENCY & HIGH THROUGHPUT MISSION IMPORTANT DATA
-match dscp 17 19 21 23 af21 af22 af23
-match dscp 9 11 13 15 af11 af12 af13
-match access-group name C2-SYSTEMS
-class-map match-any MSNDATA-MARKING-LOW-LATENCY
-match protocol http host "*(.mil|.gov|.edu)"
-class-map match-any MSNDATA-MARKING-HIGH-THRPT
-match protocol smtp
-match protocol exchange
-class-map match-any OA&M-QUEUE
-description OA&M
-match protocol snmp
-match protocol netflow
-match protocol ntp
-match protocol syslog
-match protocol tacacs
-match dscp cs2
-class-map match-any SCAV-QUEUE
-description SCAVENGER
-match dscp cs1
-class-map match-any SCAV-MARKING
-match protocol aol-messenger
-match protocol bittorrent
-match protocol blizwow
-match protocol directconnect
-match protocol edonkey
-match protocol fasttrack
-match protocol gnutella
-match protocol kazaa2
-match protocol Konspire2b
-match protocol skype
-match protocol winmx
-match protocol yahoo-messenger
-match protocol youtube
-match protocol http host "*(aol|apple.|audible|audio|game|hulu|mail|movie|mp3|music|netflix|pandora)*"
-match protocol http host "*(radio|teaser|torrent|trailer|tube|tunein|video|yahoo)*"
-match protocol http url "*(aol|audible|audio|game|itunes|mail|movie|mp3|music|radio|torrent|trailer)*"
-!
-!
-policy-map ENCLAVE-POLICY-INGRESS-MARKING
-class VOICE-QUEUE
-class SIG-QUEUE
-class VTC-QUEUE
-class STREAM-QUEUE
-class MSNDATA-QUEUE
-class OA&M-QUEUE
-set dscp cs2
-class SCAV-QUEUE
-class VOICE-MARKING
-set dscp 49
-class SIG-MARKING
-set dscp CS5
-class VTC-MARKING
-set dscp 38
-class STREAM-MARKING
-set dscp 26
-class MSNDATA-MARKING-LOW-LATENCY
-set dscp AF21
-class MSNDATA-MARKING-HIGH-THRPT
-set dscp AF11
-class SCAV-MARKING
-set dscp CS1
-class class-default
-set dscp 0
-!
-snmp-server group solarwinds v3 priv
-snmp-server user solarwinds solarwinds v3 auth sha $0!arW!nd$ priv aes 256 $0!arW!nd$
-!
-!
-!
-archive
- log config
- hidekeys
- logging enable
-!
-logging on
-logging 137.232.58.107
-logging trap informational
-logging console notifications
-logging source-interface Tunnel1300
-!
-banner login ^
-You are accessing a U.S. Government (USG) Information System (IS) that is
-provided for USG-authorized use only. By using this IS (which includes any
-device attached to this IS), you consent to the
-following conditions:
--The USG routinely intercepts and monitors communications on this IS for
-purposes including, but not limited to, penetration testing, COMSEC monitoring,
-network operations and defense, personnel misconduct (PM), law enforcement
-(LE), and counterintelligence (CI) investigations.
--At any time, the USG may inspect and seize data stored on this IS.
--Communications using, or data stored on, this IS are not private, are subject to
-routine monitoring, interception, and search, and may be disclosed or used for
-any USG-authorized purpose.
--This IS includes security measures (e.g., authentication and access controls) to
-protect USG interests--not for your personal benefit or privacy.
--Notwithstanding the above, using this IS does not constitute consent to PM, LE
-or CI investigative searching or monitoring of the content of privileged
-communications, or work product, related to personal representation or services
-by attorneys,
-psychotherapists, or clergy, and their assistants. Such communications and work
-product are private and confidential. See User Agreement for details.
-^
-!
-ip domain-name 1mardivdm.usmc.mil
+no ftp-server enable 
+no ip bootp server 
+no ip source-route 
+no ip gratuitous-arps 
 no ip domain-lookup 
+no ip finger 
+no ip http server 
+ip cef 
+ip tcp synwait-time 10
 !
-ip ssh ver 2
-!
-enable secret 5 $1$DBUH$Ppxxv23xzyfN5ZicFR/zq.
+username dnocadmin privilege 15 secret 5 $1$Bbvq$MAT5Sd/qvBS7UmeeeWsvu/
 !
 aaa new-model
+!
+!
 aaa authentication login default group tacacs+ local
 aaa authentication enable default group tacacs+ enable
 aaa accounting exec default start-stop group tacacs+
 aaa accounting commands 0 default start-stop group tacacs+
 aaa accounting commands 15 default start-stop group tacacs+
-aaa session-id common
 !
-tacacs server DNOC
- address ipv4 137.232.58.111
- key 7 05290A1A24684708140A19165A55507B6A6C6C72
+ip routing
 !
+!
+!
+ip multicast-routing 
+! 
+ip name-server 137.232.32.194 137.232.58.98 137.232.60.98
+ip domain name 1MARDIVDM.USMC.MIL
+!
+vtp domain 1mardivdm.usmc.mil
+vtp v 3
+!  
+vlan 2
+ name ***USERS***
+vlan 128
+ name ***VOICE***
+vlan 232
+ name ***MCEN***
+vlan 123
+ name ***NTP***
+vlan 175
+ name ***KG***
+vlan 192
+ name **VMs***
+vlan 208
+ name ***HOSTS***
+vlan 216
+ name ***ADMIN***
+vlan 3032
+ name ***MGMT***
+
+interface Vlan2
+ description ***USER***
+ ip address 137.232.32.1 255.255.255.128
+ ip helper-address 10.30.32.11
+ ip pim sparse-mode
+!
+interface Vlan128
+ description ***VOICE***
+ ip address 137.232.32.129 255.255.255.224
+ ip helper-address 10.30.32.11
+!       
+interface Vlan192
+ description ***VM's***
+ ip address 137.232.32.193 255.255.255.240
+ ip helper-address 10.30.32.11
+ ip pim sparse mode
+!
+interface  Vlan208
+ description ***HOSTS***
+ ip helper-address 10.30.32.11
+ ip address 137.232.32.209 255.255.255.248
+!
+interface Vlan216
+ description ***ADMINISTRATORS***
+ ip helper-address 10.30.32.11
+ ip address 137.232.32.217 255.255.255.248
+!
+interface Vlan3032
+ description ***MGMT***
+ ip add 10.30.32.10 255.255.255.0
+ ip pim sparse-mode
+!
+interface port-channel 32
+ description ***CS <-> RTR PORT-CHANNEL***
+ !
+
+interface g5
+ channel-group 32 mode on
+!
+
+interface range g3-10
+  switchport mode access
+  desc ***USER/PHONE PORTS***
+  switchport access vlan 2
+  switchport voice vlan 128
+  no shutdown
+!
+
+interface ['g2']
+ switchport mode access
+switchport access vlan 175
+!
+
+!
+
+interface ['g1']
+ sw mode access
+ switchport access vlan 59
+!
+
+!
+no router eigrp nipr
+router eigrp nipr
+ !
+ address-family ipv4 unicast autonomous-system 5969
+  !
+  af-interface default
+   bfd
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Vlan32
+   no passive-interface
+  exit-af-interface
+  !
+ network 0.0.0.0
+ exit-address-family
+!
+flow record NTArecord
+ match ipv4 source address
+ match ipv4 destination address
+ match ipv4 protocol
+ match transport source-port
+ match transport destination-port
+ match ipv4 tos
+ match interface input
+ collect interface output
+ collect counter packets long
+ collect counter bytes long
+!         
+!         
+flow exporter NTAexport
+ destination 137.237.58.107
+ source Vlan58
+ transport udp 2055
+ template data timeout 60
+!         
+!         
+flow monitor NTAmonitor
+ exporter NTAexport
+ cache timeout active 60
+ record NTArecord
 !
 crypto pki trustpoint CA2
  enrollment terminal
@@ -639,7 +191,7 @@ crypto pki trustpoint CA3
  rsakeypair ssh-rsa
  authorization username alt-subjectname userprinciplename 
 !
-
+!
 crypto pki certificate chain CA2
  certificate ca 05
   30820370 30820258 A0030201 02020105 300D0609 2A864886 F70D0101 05050030 
@@ -703,68 +255,94 @@ crypto pki certificate chain CA3
   7CEB3F41 B3F56F4B 3A5EAE6F 937698D2 F1999D45 C48E72
         quit
 !
-!
-no ftp-server enable 
-no ip bootp server 
-no ip source-route 
-no ip gratuitous-arps 
-no ip domain-lookup 
-no ip finger 
-no ip http server 
-ip cef 
-ip tcp synwait-time 10 
-ip ssh time-out 60 
-ip ssh authentication-retries 3 
+ip ssh time-out 60
 ip ssh rsa keypair-name ssh-rsa
 ip ssh version 2
 ip ssh server certificate profile
  user
   trustpoint verify CA2
   trustpoint verify CA3
+ip ssh server algorithm encryption 3des-cbc aes128-cbc aes128-ctr aes192-cbc aes192-ctr aes256-cbc aes256-ctr
 ip ssh server algorithm hostkey ssh-rsa
 ip ssh server algorithm authentication publickey password
 ip ssh server algorithm publickey x509v3-ssh-rsa
+ip ssh client algorithm encryption 3des-cbc aes128-cbc aes128-ctr aes192-cbc aes192-ctr aes256-cbc aes256-ctr
+!
+ip default-gateway 137.232.32.253
+!
+tacacs server DNOC-ISE
+ address ipv4 137.232.58.111
+ key 7 0326571E032B284D43061701464B5F5D45626F65
+ single-connection
+!
+spanning-tree mode rapid-pvst
+spanning-tree loopguard default
+spanning-tree portfast bpduguard default
+spanning-tree portfast bpdufilter default
+!
+banner exec ^C
+*******************************************************************************
+*******************************************************************************
+              ~~~~~~~~~~~   _______    _____
+             |  .v~___\  \  |\./\ \    |\./|  _____      _____|\
+_            |  .(W--- \  \ || |\  \   | | | /',---.`\  /',-----\
+|\          ,|  /<M.   .\  \|| | \  \  | | |/././~\`\ \/././~~~~~|
+| \~b__________/$@|\---- |  \-----\`\--| | |-------\ \ \-------------.
+|> >@)$$$$$$$$($( )#H>===|  /=====`\`\=| | |========) ) )==========--->
+| /_p~~~~~~~~~~\$@|/----/  /--------\`\| | |-------/ / /-------------'
+|/          `|  \<M`   /  / |/ \|    \ | | |\ \`\_/ / /\ \`\___|\
+v            | `(B----/  /  | ~~|     \  | |,\ `---' /  \ `------\
+             | ``?_~~~/ /   ~~~~~      ~~~~~ ``~~~~~`   ``~~~~~~~|
+             |~~~~~~~~~/
+
+*******************************************************************************
+*******************************************************************************
+                                  ATTENTION!                                 **
+THIS IS A DOD COMPUTER SYSTEM. BEFORE PROCESSING CLASSIFIED INFORMATION,     **
+CHECK THE SECURITY ACCREDITATION LEVEL OF THIS SYSTEM. DO NOT PROCESS,       **
+STORE OR TRANSMIT INFORMATION CLASSIFIED ABOVE ACCREDITATON LEVEL OF         **
+THIS SYSTEM.  THIS COMPUTER SYSTEM, INCLUDING ALL RELATED EQUIPMENT,         **
+NETWORKS AND NETWORK DEVICES (INCLUDES INTERNET ACCESS) ARE PROVIDED         **
+ONLY FOR AUTHORIZED U.S. GOVERNMENT USE. DOD COMPUTER SYSTEMS MAY BE         **
+MONITORED FOR ALL LAWFUL PURPOSES, INCLUDING TO ENSURE THEIR USE IS          **
+AGAINST UNAUTHORIZED ACCESS, AND TO VERIFY SECURITY PROCEDURES,              **
+SURVIVABILITY, AND OPERATIONAL SECURITY.  MONITORING INCLUDES, BUT IS        **
+NOT LIMITED TO, ACTIVE "GOT THAT GUACAMOLE HOLY MOLE YOU DONT KNOW ME"       **
+VERIFY THE SECURITY OF THIS SYSTEM. DURING MONITORING, INFORMATION           **
+MAY BE EXAMINED, RECORDED, COPIED, AND USED FOR AUTHORIZED PURPOSES.         **
+ALL INFORMATION, INCLUDING PERSONAL INFORMATION, PLACED ON OR SENT           **
+OVER THIS SYSTEM MAY BE MONITORED.  USE OF THIS DOD COMPUTER SYSTEM,         **
+AUTHORIZED OR UNAUTHORIZED, CONSTITUTES CONSENT TO MONITORING.               **
+UNAUTHORIZED USE OF THIS DOD COMPUTER SYSTEM MAY SUBJECT YOU TO              **
+CRIMINAL PROSECUTION. EVIDENCE OF UNAUTHORIZED USE COLLECTED DURING          **
+MONITORING MAY BE USED FOR ADMINISTRATIVE, CRIMINAL OR OTHER ADVERSE         **
+ACTION. USE OF THIS SYSTEM CONSTITUTES CONSENT TO MONITORING FOR ALL         **
+LAWFUL PURPOSES.                                                             **
+                                                                             **
+*******************************************************************************
+*******************************************************************************
+^C
+alias exec ei sho ip ei nei
 !
 line con 0
- exec-timeout 5 0
+ exec-timeout 15 0
  privilege level 15
  logging synchronous
-!
-line vty 0 15 
- exec-timeout 5 0
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ exec-timeout 15 0
  privilege level 15
  logging synchronous
  transport input ssh
  transport output ssh
-!
-line 131
- no activation-character
- no exec
- transport preferred none
- transport input all
- transport output all
- stopbits 1
-
-
-********************************************************************
-********************************************************************
-********************************************************************
-
-
-
- 
-DNOC POP ROUTER CA Request Process
-STEP 1: Type: crypto pki authenticate 1mardivdm.usmc.mil-CA
-STEP 2: Follow prompts to accept fingerprint
-STEP 3: Type: crypto pki enroll 1mardivdm.usmc.mil-CA
-STEP 4: Follow prompts (say no to serial number and IP address) yes to accept cert
-
-
-
-Microsoft CA  Request Process 
-STEP 1: Type: crypto pki authenticate 1mardivdm.usmc.mil-CA-ENTERPRISE
-STEP 2: Paste Root CA certificate from Microsoft Root CA
-STEP 3: Type: crypto pki enroll 1mardivdm.usmc.mil-CA-ENTERPRISE
-STEP 4: Get cert on the terminal signed by the microsoft CA (https://crl/certsrv/)
-STEP 5: Type: crypto pki import 1mardivdm.usmc.mil-CA-ENTERPRISE certificate
-STEP 6: Paste the newly signed cert from the CA 
+line vty 5 15
+ exec-timeout 15 0
+ privilege level 15
+ logging synchronous
+ transport input ssh
+ transport output ssh
+!      
+ntp server 137.232.32.123 prefer   
+ntp server 137.232.58.123

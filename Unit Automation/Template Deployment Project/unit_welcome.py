@@ -1,5 +1,5 @@
 import time
-
+import shutil
 
 # Registers users input and defines the template to use for jinja2 -> final device template
 
@@ -7,9 +7,14 @@ Device_Template = ""
 
 
 def welcome_script():
+    def wrong_input():
+        time.sleep(1)
+        print("\n**********************************************\nThat is not a valid option, please try again.\n**********************************************\n")
+        time.sleep(2)
     global Device_Template
     print("*************************************************")
     print("Welcome to the Unit Template Configuration Engine")
+    print("Please ensure all physical cabling is complete,\nWe will be referencing these connections in the future!")
     print("*************************************************")
     time.sleep(2)
 
@@ -28,16 +33,23 @@ def welcome_script():
         Device_Type = input(
             f"What type of Device are you configuring?\nA - {devices['a']}\nB - {devices['b']}\n\nPlease Select: "
         ).lower()
-
-        #Checks to see if CS is being implemented
-        using_cs = input(
-            "\nWill your topology include a Core Switch? (Router -> CS -> Fiber/VSAT/Taclane/etc)\n ***SELECT NO IF CS ALREADY CONFIGURED*** [Y/n]: "
-        ).lower()
-
-        #Sets Device Template to Core Switch if still has to be configured
-        if using_cs == "y":
-            print("We will be configuring your Core Switch First! Please ensure this device is connected to it and accessible via SSH.")
-            Device_Type = "c"
+        if Device_Type in ["a", "b", "c"]:
+            
+            
+            #Checks to see if CS is being implemented
+            using_cs =''
+            while using_cs not in ['y', 'n']:
+                using_cs = input(
+                    "\n\nWill your topology include a Core Switch? (Router -> CS -> Fiber/VSAT/Taclane/etc)\n\n***SELECT NO IF CS ALREADY CONFIGURED***[Y/n]: "
+                ).lower()
+                if using_cs == "n":
+                    continue
+                    #Sets Device Template to Core Switch if still has to be configured
+                elif using_cs == "y":
+                    print("\nWe will be configuring your Core Switch First! \nPlease ensure this device is connected to it and accessible via SSH.")
+                    Device_Type = "c"
+                else:
+                    wrong_input()
         
         #Selects Device Template for J2 conversion
         if Device_Type == "a":
@@ -47,14 +59,19 @@ def welcome_script():
         elif Device_Type == "c":
             Device_Template = "CS-template.j2"
         else:
-            print("That is not a valid option, please try again.")
-            time.sleep(2)
+            wrong_input()
     print(Device_Template)
     time.sleep(1)
-    print("\n*************************************************")
+    print("\n**************************************************************")
     verification = input(
         f"Please verify you are working on a {devices[Device_Type]}(Y/n): "
     ).lower()
     if verification != "y":
+        for _ in range(3):
+            time.sleep(0.3)
+            print(".")
         print("Exiting Script, please try again")
         quit()
+    else:
+        shutil.copy(f"/var/NetAuto/Unit Automation/Template Deployment Project/device_templates/{Device_Template}", "/var/NetAuto/Unit Automation/Template Deployment Project" )
+
