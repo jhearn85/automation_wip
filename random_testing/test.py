@@ -8,12 +8,12 @@ print("we done")
 
 
 #true/false calc
-i = int(input("Give me a number yo"))
+i = int(input("Give me a number"))
 
 if i % 2 == 0:
     print("this is even")
 else:
-    print("that do be odd doe")
+    print("odd
 
 
 
@@ -29,7 +29,7 @@ while guess != secret:
     if count >= 3:
         print("You Lose!")
 
-print("you ween!")
+print("you win")
 
 
 #exponent calc without **
@@ -59,7 +59,7 @@ for row in grid:
             notfound = False
             break
 if notfound:
-    print("tough luck")
+    print("fail")
 
 
 
@@ -83,7 +83,7 @@ translate(input("What do you want to translate: "))
 
 #attempt following action
 try:
-    num = int(input("give a number yo: "))
+    num = int(input("give a number: "))
     print(num)
     #this will fail
     value = 10/0
