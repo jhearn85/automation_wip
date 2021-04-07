@@ -19,6 +19,7 @@ Primary focus on creating an automated tool for creating and pushing configurati
 - Multiple topography models:
 - VSAT (Large only)
 -   Fiber (Currently only local - remote base in progress)
+
 Still in progress:
 -   TAMPA
 -   NOTM
