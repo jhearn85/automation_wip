@@ -1,0 +1,16 @@
+[layer2]
+Sw1 ansible_host=172.16.1.111
+Sw2 ansible_host=172.16.1.112
+Sw3 ansible_host=172.16.1.113
+Sw4 ansible_host=172.16.1.114
+Sw5 ansible_host=172.16.1.115
+Sw6 ansible_host=172.16.1.116
+ 
+[layer3]
+Sw1L3 ansible_host=172.16.1.10
+Sw2L3 ansible_host=172.16.1.20
+ 
+[switch:children]
+layer2
+layer3
+

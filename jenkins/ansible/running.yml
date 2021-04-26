@@ -1,0 +1,43 @@
+---
+- name: Running VLAN config...
+  hosts: switch
+  gather_facts: false
+ 
+  tasks:
+    - name: Create VLAN...
+      ios_vlans:
+        config:
+          - name: "{{ item.name }}"
+            vlan_id: "{{ item.id }}"
+            state: active
+            shutdown: disabled
+        state: merged
+      loop: "{{ vlan }}"
+ 
+    - name: Set ip for VLAN...
+      ios_config:
+        lines:
+          - interface vlan {{ item.vlan_id }}
+          - ip add {{ item.ipv4 }}
+        after:
+          - no shutdown
+      loop: "{{ ip_vlan[inventory_hostname] }}"
+      when: ip_vlan[inventory_hostname] is defined
+ 
+    - name: Config Trunk...
+      ios_config:
+        lines:
+          - interface {{ item.interface }}
+          - switchport mode trunk
+          - switchport trunk encapsulation dot1q
+          - switchport trunk allowed vlan add {{ item.allow }}
+      loop: "{{ trunk[inventory_hostname] }}"
+ 
+    - name: Config Access...
+      ios_config:
+        lines:
+          - interface {{ item.interface }}
+          - switchport mode access
+          - switchport access vlan {{ item.vlan_access }}
+      loop: "{{ access[inventory_hostname] }}"
+      when: access[inventory_hostname] is defined

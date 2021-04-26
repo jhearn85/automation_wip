@@ -1,0 +1,37 @@
+---
+ansible_network_os: ios
+ansible_connection: network_cli
+ansible_user: admin
+ansible_ssh_pass: 123
+ansible_become: yes
+ 
+vlan:
+  - { name: Tech, id: 10 }
+  - { name: Sale, id: 20 }
+  - { name: Intern, id: 30 }
+  - { name: Accountant, id: 40 }
+ 
+ip_vlan:
+  Sw1L3:
+    - { vlan_id: 10, ipv4: '192.168.10.1 255.255.255.0'}
+    - { vlan_id: 20, ipv4: '192.168.20.1 255.255.255.0'}
+    - { vlan_id: 30, ipv4: '192.168.30.1 255.255.255.0'}
+    - { vlan_id: 40, ipv4: '192.168.40.1 255.255.255.0'}
+  Sw2L3:
+    - { vlan_id: 10, ipv4: '192.168.10.2 255.255.255.0'}
+    - { vlan_id: 20, ipv4: '192.168.20.2 255.255.255.0'}
+    - { vlan_id: 30, ipv4: '192.168.30.2 255.255.255.0'}
+    - { vlan_id: 40, ipv4: '192.168.40.2 255.255.255.0'}
+ 
+trunk:
+  Sw1L3:
+    - { interface: e0/2, encapsulation: dot1q, allow: "10,20,30,40" }
+    - { interface: e1/1, encapsulation: dot1q, allow: "10,20" }
+    - { interface: e1/2, encapsulation: dot1q, allow: "30,40" }
+    - { interface: e1/3, encapsulation: dot1q, allow: "20,30" }
+  Sw2L3:
+    - { interface: e0/2, encapsulation: dot1q, allow: "10,20,30,40" }
+    - { interface: e1/1, encapsulation: dot1q, allow: "10,20,40" }
+    - { interface: e1/2, encapsulation: dot1q, allow: 20 }
+    - { interface: e1/3, encapsulation: dot1q, allow: 40 }
+
